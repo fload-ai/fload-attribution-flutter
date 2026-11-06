@@ -16,3 +16,10 @@ files differ from the tag.
 
 The example apps send only to the local ingest stub in `tool/`, never to
 Fload's production ingest.
+
+## Releasing
+
+Bump `version` in `pubspec.yaml` (and the podspec), add a `CHANGELOG.md`
+entry, merge, then push a tag `v<version>` (for example `v1.0.1`). The
+`Publish to pub.dev` workflow publishes it with GitHub's OIDC token; pub.dev
+accepts it only from this repository and the `v{{version}}` tag pattern.
