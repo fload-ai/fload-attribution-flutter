@@ -137,7 +137,7 @@ simulator or emulator against the stub.
   tag of the iOS repo. `scripts/vendor-ios-sdk.sh` refreshes them and
   `scripts/vendor-ios-sdk.sh --check` verifies them.
 - Android: the plugin depends on the Fload Android SDK
-  (`com.github.fload-ai:fload-attribution-android:1.0.1`, from JitPack).
+  (`com.github.fload-ai:fload-attribution-android:1.0.2`, from JitPack).
 
 ## License
 

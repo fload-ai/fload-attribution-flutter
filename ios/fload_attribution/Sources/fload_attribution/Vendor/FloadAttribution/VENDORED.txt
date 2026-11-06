@@ -1,1 +1,1 @@
-Vendored from https://github.com/fload-ai/fload-attribution-ios.git at tag 1.0.0 (commit 809caae90cc1a4535a511f46f261db7b20254f15) by scripts/vendor-ios-sdk.sh. Do not edit.
+Vendored from https://github.com/fload-ai/fload-attribution-ios.git at tag 1.0.2 (commit ab914a6c9a4ad5691b39489aaaeddf74176f7b8d) by scripts/vendor-ios-sdk.sh. Do not edit.

@@ -87,7 +87,7 @@ kotlin {
 
 dependencies {
     // The Fload Android SDK, built by JitPack from github.com/fload-ai/fload-attribution-android.
-    implementation("com.github.fload-ai:fload-attribution-android:1.0.1")
+    implementation("com.github.fload-ai:fload-attribution-android:1.0.2")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.mockito:mockito-core:5.0.0")
 }
