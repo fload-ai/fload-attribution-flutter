@@ -1,0 +1,62 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dart:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: dart format --output=none --set-exit-if-changed lib test example/lib example/test example/integration_test
+      - run: flutter analyze
+      - run: flutter test
+      - run: cd example && flutter test
+      - run: flutter pub publish --dry-run
+      - name: Vendored iOS SDK matches its tag
+        run: scripts/vendor-ios-sdk.sh --check
+
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: cd example && flutter build apk --debug
+      - name: Kotlin unit tests
+        run: cd example/android && ./gradlew :fload_attribution:testDebugUnitTest --console=plain
+
+  ios:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        swift-package-manager: [true, false]
+    name: ios (swift package manager ${{ matrix.swift-package-manager }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter config --${{ matrix.swift-package-manager && 'enable' || 'no-enable' }}-swift-package-manager
+      - run: cd example && flutter build ios --simulator --debug
+      - name: Swift unit tests
+        if: matrix.swift-package-manager
+        run: |
+          cd example/ios
+          xcodebuild test -workspace Runner.xcworkspace -scheme Runner -configuration Debug \
+            -destination 'platform=iOS Simulator,name=iPhone 17' -quiet
