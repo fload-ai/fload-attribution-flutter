@@ -27,8 +27,11 @@ enum FloadLogLevel { none, error, warning, info, debug }
 /// FloadAttribution.setUserId(await Purchases.appUserID);
 /// ```
 abstract final class FloadAttribution {
-  /// This plugin's version.
-  static const String version = '1.0.0';
+  /// This plugin's version. A test holds it equal to `pubspec.yaml`'s.
+  static const String version = '1.1.0';
+
+  /// This wrapper's name for Fload, sent with every request as `sdk.wrapper`.
+  static const String _wrapperName = 'flutter';
 
   /// The channel to the native halves. Visible for tests only.
   @visibleForTesting
@@ -52,6 +55,8 @@ abstract final class FloadAttribution {
       'key': key,
       'endpoint': endpoint?.toString(),
       'logLevel': logLevel.name,
+      'wrapperName': _wrapperName,
+      'wrapperVersion': version,
     });
   }
 

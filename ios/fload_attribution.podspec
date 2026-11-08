@@ -5,7 +5,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'fload_attribution'
-  s.version          = '1.0.0'
+  s.version          = '1.1.0'
   s.summary          = 'Fload install attribution for Flutter: Apple AdServices on iOS.'
   s.description      = <<-DESC
 Reports the app's install to Fload with Apple's AdServices attribution token.

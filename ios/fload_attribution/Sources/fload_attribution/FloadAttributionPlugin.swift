@@ -18,7 +18,12 @@ public final class FloadAttributionPlugin: NSObject, FlutterPlugin {
             guard let key = arguments["key"] as? String else {
                 return result(FlutterError(code: "bad_arguments", message: "configure needs a key", details: nil))
             }
-            guard let options = Self.options(endpoint: arguments["endpoint"] as? String, logLevel: arguments["logLevel"] as? String) else {
+            guard let options = Self.options(
+                endpoint: arguments["endpoint"] as? String,
+                logLevel: arguments["logLevel"] as? String,
+                wrapperName: arguments["wrapperName"] as? String,
+                wrapperVersion: arguments["wrapperVersion"] as? String
+            ) else {
                 return result(FlutterError(code: "bad_arguments", message: "the endpoint is not a URL", details: nil))
             }
             Fload.configure(key: key, options: options)
@@ -37,13 +42,19 @@ public final class FloadAttributionPlugin: NSObject, FlutterPlugin {
     }
 
     /// The SDK's options from the channel's strings; nil when the endpoint is not a URL.
-    static func options(endpoint: String?, logLevel: String?) -> FloadOptions? {
-        var options = FloadOptions(logLevel: level(logLevel))
+    /// The wrapper (this plugin's name and version, from Dart) goes on every request as `sdk.wrapper`.
+    static func options(endpoint: String?, logLevel: String?, wrapperName: String?, wrapperVersion: String?) -> FloadOptions? {
+        var options = FloadOptions(logLevel: level(logLevel), wrapper: wrapper(name: wrapperName, version: wrapperVersion))
         if let endpoint, !endpoint.isEmpty {
             guard let url = URL(string: endpoint), url.scheme != nil else { return nil }
             options.endpoint = url
         }
         return options
+    }
+
+    static func wrapper(name: String?, version: String?) -> FloadWrapper? {
+        guard let name, let version else { return nil }
+        return FloadWrapper(name: name, version: version)
     }
 
     static func level(_ name: String?) -> FloadLogLevel {
