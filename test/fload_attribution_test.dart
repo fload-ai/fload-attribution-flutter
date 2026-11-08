@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fload_attribution/fload_attribution.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -19,12 +21,44 @@ void main() {
   tearDown(
       () => messenger.setMockMethodCallHandler(FloadAttribution.channel, null));
 
+  /// The `version:` line of a file in this package.
+  String versionIn(String path, RegExp pattern) =>
+      pattern.firstMatch(File(path).readAsStringSync())!.group(1)!;
+
+  final pubspecVersion =
+      versionIn('pubspec.yaml', RegExp(r'^version:\s*(\S+)', multiLine: true));
+
   test('configure sends the key, no endpoint and the warning level by default',
       () async {
     await FloadAttribution.configure('fload_pk_test');
     expect(calls.single.method, 'configure');
-    expect(calls.single.arguments,
-        {'key': 'fload_pk_test', 'endpoint': null, 'logLevel': 'warning'});
+    expect(calls.single.arguments, {
+      'key': 'fload_pk_test',
+      'endpoint': null,
+      'logLevel': 'warning',
+      'wrapperName': 'flutter',
+      'wrapperVersion': pubspecVersion,
+    });
+  });
+
+  test('configure names this wrapper and its pubspec version (FLO-3957)',
+      () async {
+    await FloadAttribution.configure('fload_pk_test');
+    final arguments = calls.single.arguments as Map<Object?, Object?>;
+    expect(arguments['wrapperName'], 'flutter');
+    expect(arguments['wrapperVersion'], pubspecVersion);
+  });
+
+  test('every copy of the version is the pubspec version', () {
+    expect(FloadAttribution.version, pubspecVersion);
+    expect(
+        versionIn('ios/fload_attribution.podspec',
+            RegExp(r"s\.version\s*=\s*'([^']+)'")),
+        pubspecVersion);
+    expect(
+        versionIn('android/build.gradle.kts',
+            RegExp(r'^version\s*=\s*"([^"]+)"', multiLine: true)),
+        pubspecVersion);
   });
 
   test('configure sends the endpoint and level it is given', () async {
@@ -36,7 +70,9 @@ void main() {
     expect(calls.single.arguments, {
       'key': 'fload_pk_test',
       'endpoint': 'http://10.0.2.2:3999',
-      'logLevel': 'debug'
+      'logLevel': 'debug',
+      'wrapperName': 'flutter',
+      'wrapperVersion': pubspecVersion,
     });
   });
 
