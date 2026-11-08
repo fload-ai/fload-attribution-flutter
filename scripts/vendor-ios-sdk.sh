@@ -11,7 +11,7 @@
 set -euo pipefail
 
 IOS_SDK_REPO="https://github.com/fload-ai/fload-attribution-ios.git"
-IOS_SDK_TAG="1.0.2"
+IOS_SDK_TAG="1.1.0"
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
 dest="$root/ios/fload_attribution/Sources/fload_attribution/Vendor/FloadAttribution"

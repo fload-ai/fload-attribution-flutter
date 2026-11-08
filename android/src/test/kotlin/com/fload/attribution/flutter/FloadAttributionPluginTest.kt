@@ -6,20 +6,45 @@ import io.flutter.plugin.common.MethodChannel
 import org.mockito.Mockito
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class FloadAttributionPluginTest {
     @Test
     fun `options default to Fload's endpoint and the warning level`() {
-        val options = FloadAttributionPlugin.options(null, null)
+        val options = FloadAttributionPlugin.options(null, null, null, null)
         assertEquals("https://ingest.fload.com", options.endpoint)
         assertEquals(FloadLogLevel.WARNING, options.logLevel)
     }
 
     @Test
     fun `options carry the endpoint and level the app gives`() {
-        val options = FloadAttributionPlugin.options("http://10.0.2.2:3999", "debug")
+        val options = FloadAttributionPlugin.options("http://10.0.2.2:3999", "debug", null, null)
         assertEquals("http://10.0.2.2:3999", options.endpoint)
         assertEquals(FloadLogLevel.DEBUG, options.logLevel)
+    }
+
+    @Test
+    fun `options name the wrapper and the version Dart sends (FLO-3957)`() {
+        val options = FloadAttributionPlugin.options(null, "debug", "flutter", "1.1.0")
+        assertEquals("flutter", options.wrapper?.name)
+        assertEquals("1.1.0", options.wrapper?.version)
+        assertEquals("https://ingest.fload.com", options.endpoint)
+        assertEquals(FloadLogLevel.DEBUG, options.logLevel)
+    }
+
+    @Test
+    fun `options with an endpoint name the wrapper too`() {
+        val options = FloadAttributionPlugin.options("http://10.0.2.2:3999", null, "flutter", "1.1.0")
+        assertEquals("http://10.0.2.2:3999", options.endpoint)
+        assertEquals("flutter", options.wrapper?.name)
+        assertEquals("1.1.0", options.wrapper?.version)
+    }
+
+    @Test
+    fun `options without a wrapper name or version name none`() {
+        assertNull(FloadAttributionPlugin.options(null, null, null, null).wrapper)
+        assertNull(FloadAttributionPlugin.options(null, null, "flutter", null).wrapper)
+        assertNull(FloadAttributionPlugin.options(null, null, null, "1.1.0").wrapper)
     }
 
     @Test

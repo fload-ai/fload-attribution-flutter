@@ -4,6 +4,7 @@ import android.content.Context
 import com.fload.attribution.Fload
 import com.fload.attribution.FloadLogLevel
 import com.fload.attribution.FloadOptions
+import com.fload.attribution.FloadWrapper
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -33,7 +34,13 @@ class FloadAttributionPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                     result.error("bad_arguments", "configure needs a key", null)
                     return
                 }
-                Fload.configure(app, key, options(call.argument("endpoint"), call.argument("logLevel")))
+                val options = options(
+                    call.argument("endpoint"),
+                    call.argument("logLevel"),
+                    call.argument("wrapperName"),
+                    call.argument("wrapperVersion"),
+                )
+                Fload.configure(app, key, options)
                 result.success(null)
             }
             "setUserId" -> {
@@ -53,13 +60,17 @@ class FloadAttributionPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     internal companion object {
         const val CHANNEL = "com.fload.attribution"
 
-        /** The SDK's options from the channel's strings. */
-        fun options(endpoint: String?, logLevel: String?): FloadOptions {
+        /**
+         * The SDK's options from the channel's strings. The wrapper (this
+         * plugin's name and version, from Dart) goes on every request as `sdk.wrapper`.
+         */
+        fun options(endpoint: String?, logLevel: String?, wrapperName: String?, wrapperVersion: String?): FloadOptions {
             val level = level(logLevel)
+            val wrapper = if (wrapperName != null && wrapperVersion != null) FloadWrapper(wrapperName, wrapperVersion) else null
             return if (endpoint.isNullOrEmpty()) {
-                FloadOptions(logLevel = level)
+                FloadOptions(logLevel = level, wrapper = wrapper)
             } else {
-                FloadOptions(endpoint = endpoint, logLevel = level)
+                FloadOptions(endpoint = endpoint, logLevel = level, wrapper = wrapper)
             }
         }
 

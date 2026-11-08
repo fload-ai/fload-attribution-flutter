@@ -20,19 +20,42 @@ class RunnerTests: XCTestCase {
   }
 
   func testOptionsDefaultToFloadsEndpointAndTheWarningLevel() {
-    let options = FloadAttributionPlugin.options(endpoint: nil, logLevel: nil)
+    let options = FloadAttributionPlugin.options(endpoint: nil, logLevel: nil, wrapperName: nil, wrapperVersion: nil)
     XCTAssertEqual(options?.endpoint, URL(string: "https://ingest.fload.com"))
     XCTAssertEqual(options?.logLevel, .warning)
   }
 
   func testOptionsCarryTheEndpointAndLevelTheAppGives() {
-    let options = FloadAttributionPlugin.options(endpoint: "http://localhost:3999", logLevel: "debug")
+    let options = FloadAttributionPlugin.options(
+      endpoint: "http://localhost:3999", logLevel: "debug", wrapperName: nil, wrapperVersion: nil)
     XCTAssertEqual(options?.endpoint, URL(string: "http://localhost:3999"))
     XCTAssertEqual(options?.logLevel, .debug)
   }
 
   func testAnEndpointThatIsNotAURLIsRefused() {
-    XCTAssertNil(FloadAttributionPlugin.options(endpoint: "not a url", logLevel: nil))
+    XCTAssertNil(FloadAttributionPlugin.options(
+      endpoint: "not a url", logLevel: nil, wrapperName: "flutter", wrapperVersion: "1.1.0"))
+  }
+
+  func testOptionsNameTheWrapperAndTheVersionDartSends() {
+    let options = FloadAttributionPlugin.options(
+      endpoint: nil, logLevel: "debug", wrapperName: "flutter", wrapperVersion: "1.1.0")
+    XCTAssertEqual(options?.wrapper, FloadWrapper(name: "flutter", version: "1.1.0"))
+    XCTAssertEqual(options?.endpoint, URL(string: "https://ingest.fload.com"))
+    XCTAssertEqual(options?.logLevel, .debug)
+  }
+
+  func testOptionsWithAnEndpointNameTheWrapperToo() {
+    let options = FloadAttributionPlugin.options(
+      endpoint: "http://localhost:3999", logLevel: nil, wrapperName: "flutter", wrapperVersion: "1.1.0")
+    XCTAssertEqual(options?.endpoint, URL(string: "http://localhost:3999"))
+    XCTAssertEqual(options?.wrapper, FloadWrapper(name: "flutter", version: "1.1.0"))
+  }
+
+  func testOptionsWithoutAWrapperNameOrVersionNameNone() {
+    XCTAssertNil(FloadAttributionPlugin.options(endpoint: nil, logLevel: nil, wrapperName: nil, wrapperVersion: nil)?.wrapper)
+    XCTAssertNil(FloadAttributionPlugin.options(endpoint: nil, logLevel: nil, wrapperName: "flutter", wrapperVersion: nil)?.wrapper)
+    XCTAssertNil(FloadAttributionPlugin.options(endpoint: nil, logLevel: nil, wrapperName: nil, wrapperVersion: "1.1.0")?.wrapper)
   }
 
   func testEveryDartLogLevelMapsToTheSdks() {

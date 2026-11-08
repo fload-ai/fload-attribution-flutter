@@ -1,5 +1,5 @@
 group = "com.fload.attribution.flutter"
-version = "1.0.0"
+version = "1.1.0"
 
 buildscript {
     val kotlinVersion = "2.4.0"
@@ -87,7 +87,7 @@ kotlin {
 
 dependencies {
     // The Fload Android SDK, built by JitPack from github.com/fload-ai/fload-attribution-android.
-    implementation("com.github.fload-ai:fload-attribution-android:1.0.2")
+    implementation("com.github.fload-ai:fload-attribution-android:1.1.0")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.mockito:mockito-core:5.0.0")
 }
