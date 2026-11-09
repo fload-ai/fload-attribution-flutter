@@ -4,6 +4,8 @@
 # pattern v{{version}}. The tag must match pubspec.yaml's version.
 #
 # 1.0.0 is published by hand (its tag is 1.0.0, so this does not run for it).
+# The reusable workflow always installs Flutter; it takes no use-flutter input,
+# and an undeclared input fails the run at startup (v1.1.0's first run).
 name: Publish to pub.dev
 
 on:
@@ -16,5 +18,3 @@ jobs:
     permissions:
       id-token: write # Required for authentication using OIDC
     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
-    with:
-      use-flutter: true
